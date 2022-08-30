@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        #content {
+            width: 50%;
+            margin: 10px auto;
+            border: 1px black solid;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        #configButtons {
+            width: 75%;
+            margin: 5px auto;
+        }
+
+        .configButton {
+            width: 45%;
+            float: left;
+            margin: 5px;
+
+        }
+
+        #saveButton {
+            background-color: green;
+
+        }
+
+        #backButton {
+            background-color: aqua;
+
+        }
+
+        .configButton {
+            border: 1px black solid;
+            height: 50px;
+            color: "black";
+        }
+
+        .configDivs {
+            margin: 10px;
+            padding: 5px;
+        }
+
+        #backButton:hover {
+            background-color: black;
+            color: white;
+
+        }
+
+        #saveButton:hover {
+            background-color: black;
+            color: white;
+
+        }
+    </style>
+
+    <title>Bot Config</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="uiStyle.css">
+
+
+</head>
+
+<body>
+    <script src="nav.js"></script>
+
+    <div id="content">
+        <div>
+            <input id="Id" class="configInputs" hidden />
+        </div>
+        <div class="configDivs">
+            <label for="Symbol">Symbol:</label><br>
+            <input id="Symbol" class="configInputs" />
+        </div>
+        <div class="configDivs">
+            <label for="LowerLevel">Lower Level:</label><br>
+            <input id="LowerLevel" class="configInputs" />
+        </div>
+        <div class="configDivs">
+            <label for="HigherLevel">Higher Level:</label><br>
+            <input id="HigherLevel" class="configInputs" />
+        </div>
+        <div class="configDivs">
+            <label for="MinToken">Min Token Sale:</label><br>
+            <input id="MinToken" class="configInputs" />
+        </div>
+        <div class="configDivs">
+            <label for="MaxToken">Max Token Sale:</label><br>
+            <input id="MaxToken" class="configInputs" />
+        </div>
+        <div class="configDivs">
+            <label for="MinUSDT">Min USDT Buy:</label><br>
+            <input id="MinUSDT" class="configInputs" />
+        </div>
+        <div class="configDivs">
+            <label for="MaxUSDT">Max USDT Buy</label><br>
+            <input id="MaxUSDT" class="configInputs" />
+        </div>
+        <div class="configDivs">
+            <label for="TokenBalanceThreshold">Token Balance Threshold</label><br>
+            <input id="TokenBalanceThreshold" class="configInputs" />
+        </div>
+        <div class="configDivs">
+            <label for="USDTBalanceThreshold">USDT Balance Threshold</label><br>
+            <input id="USDTBalanceThreshold" class="configInputs" />
+        </div>
+
+        <br>
+        <div id="configButtons">
+            <button class="configButton" onclick="backPage()" id="backButton">Back</button>
+            <button class="configButton" onclick="saveChanges()" id="saveButton">Save Changes</button>
+        </div>
+    </div>
+    <script>
+        document.getElementById("Id").value = localStorage.getItem("botid");
+        document.getElementById("Symbol").value = localStorage.getItem("symbol");
+        document.getElementById("MinToken").value = localStorage.getItem("mintokentrade");
+        document.getElementById("MaxToken").value = localStorage.getItem("maxtokentrade");
+        document.getElementById("MinUSDT").value = localStorage.getItem("minusdttrade");
+        document.getElementById("MaxUSDT").value = localStorage.getItem("maxusdttrade");
+        document.getElementById("TokenBalanceThreshold").value = localStorage.getItem("tokenthreshold");
+        document.getElementById("USDTBalanceThreshold").value = localStorage.getItem("usdtthreshold");
+        document.getElementById("LowerLevel").value = localStorage.getItem("lowerlevel");
+        document.getElementById("HigherLevel").value = localStorage.getItem("upperlevel");
+
+        function backPage() {
+            window.location = "bots.html";
+        }
+        function saveChanges() {
+            var id = document.getElementById("Id").value;
+            var lowerLevel = document.getElementById("LowerLevel").value;
+            var upperLevel = document.getElementById("HigherLevel").value;
+            var minTokenTrade = document.getElementById("MinToken").value;
+            var maxTokenTrade = document.getElementById("MaxToken").value;
+            var minUSDT = document.getElementById("MinUSDT").value;
+            var maxUSDT = document.getElementById("MaxUSDT").value;
+            var tokenBalanceThreshold = document.getElementById("TokenBalanceThreshold").value;
+            var USDTBalanceThreshold = document.getElementById("USDTBalanceThreshold").value;
+
+            var http = new XMLHttpRequest();
+            $url = 'http://157.245.139.242/config';
+
+
+            $fields = "id=" + id
+                + "&mintokenpertrade=" + minTokenTrade
+                + "&maxtokenpertrade=" + maxTokenTrade
+                + "&minusdtpertrade=" + minUSDT
+                + "&maxusdtpertrade=" + maxUSDT
+                + "&minimpulsebuy=0&maximpulsebuy=0"
+                + "&tokenbalancethreshold=" + tokenBalanceThreshold
+                + "&usdtbalancethreshold=" + USDTBalanceThreshold
+                + "&lowerlevel=" + lowerLevel
+                + "&upperlevel=" + upperLevel
+
+            http.open('PATCH', $url, true);
+
+            console.log("sending");
+            console.log(id);
+
+            //Send the proper header information along with the request
+            http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+            http.onreadystatechange = function () {//Call a function when the state changes.
+                if (http.readyState == 4 && http.status == 200) {
+                    alert("updated config successfully!");
+                    window.location = "bots.html";
+
+                }
+
+            }
+            http.send($fields);
+
+
+        }
+    </script>
+</body>
+
+</html>

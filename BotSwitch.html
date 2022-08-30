@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        #stateButton {
+            padding: 5px;
+            color: black;
+            border: 1px black solid;
+            height: 50px;
+            width: 200px;
+        }
+
+        table {
+
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 90%;
+            margin: 5px auto;
+
+        }
+
+        td,
+        th {
+
+            border: 1px solid black;
+            text-align: center;
+            padding: 15px;
+
+        }
+
+        .exclude {
+            border: 1px solid white;
+
+        }
+
+        button {
+            width: 200px;
+            height: 50px;
+        }
+
+        .yes {
+            background-color: green;
+        }
+
+        .no {
+            background-color: red;
+        }
+    </style>
+
+    <title>Bot Switches</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="uiStyle.css">
+
+
+</head>
+
+
+<body onload="getBots()">
+    <script src="nav.js"></script>
+
+    <table id="botList">
+        <tr>
+            <th>Symbol</th>
+            <th>Bot Type</th>
+            <th>Lower Level</th>
+            <th>Upper Level</th>
+        </tr>
+    </table>
+
+    <script>
+
+        function getID(id) {
+            console.log(id);
+            status = "";
+
+            var state = document.getElementById(id).innerHTML;
+            const btn = document.getElementById(id);
+            if (state == "Deactivated") {
+                document.getElementById(id).innerHTML = "Activated";
+                btn.style.backgroundColor = "green";
+                status = "yes";
+            } else {
+                document.getElementById(id).innerHTML = "Deactivated";
+                btn.style.backgroundColor = "red";
+                status = "no";
+            }
+
+            var http = new XMLHttpRequest();
+            $url = 'http://157.245.139.242/status';
+            $fields = "id=" + id + "&status=" + status;
+            http.open('PATCH', $url, true);
+
+            console.log("sending");
+
+            //Send the proper header information along with the request
+            http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+            http.onreadystatechange = function () {//Call a function when the state changes.
+                if (http.readyState == 4 && http.status == 200) {
+
+
+
+                }
+
+            }
+            http.send($fields);
+        }
+
+        function getBots() {
+            var http = new XMLHttpRequest();
+            $url = 'http://157.245.139.242/bots';
+
+            http.open('GET', $url, true);
+
+            console.log("sending");
+
+            //Send the proper header information along with the request
+            http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+            http.onreadystatechange = function () {//Call a function when the state changes.
+                if (http.readyState == 4 && http.status == 200) {
+                    //alert(http.responseText);
+                    var $response = JSON.parse(http.responseText);
+                    //alert($response['Success'][0][0]);
+                    $data = $response['Success'];
+                    // /            document.getElementById('client').value = parsed_data.client_name;
+                    for (var index = 0; index <= $data.length - 1; index++) {
+                        temp_string = ""
+                        temp_string += '<tr><td>' + $data[index][0] + '</td>'
+                            + '<td>' + $data[index][2] + '</td>'
+                            + '<td>' + $data[index][12] + '</td>'
+                            + '<td>' + $data[index][13] + '</td>'
+                        //+ '<td class="exclude"><button  onclick="getID(this.id)" class="'+ $data[index][1] + '" id="' + $data[index][11] + '">SWITCH</button></td></tr>'
+
+
+                        activated = $data[index][1];
+                        console.log(activated);
+                        if (activated === 'yes') {
+                            temp_string += '<td class="exclude"><button  onclick="getID(this.id)" class="' + $data[index][1] + '" id="' + $data[index][11] + '">Activated</button></td></tr>'
+
+                        } else {
+                            temp_string += '<td class="exclude"><button  onclick="getID(this.id)" class="' + $data[index][1] + '" id="' + $data[index][11] + '">Deactivated</button></td></tr>'
+                        }
+
+                        $('#botList').append(temp_string);
+
+                    }
+                }
+
+            }
+            http.send(null);
+        }
+
+
+
+    </script>
+</body>
+
+</html>
